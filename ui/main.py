@@ -282,7 +282,8 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, Ui_load_file_1.Ui_LoadFile):
         self.dbpath = self.lineEdit.text()
 
     def update_windowname(self):
-        self.windowname = self.lineEdit.text()
+        self.windowname = self.lineEdit_2.text()
+        print(self.windowname)
 
     def save_to_dict(self):
         conn = sqlite3.connect(self.dbpath)
@@ -292,27 +293,27 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, Ui_load_file_1.Ui_LoadFile):
             self.id_dict[row[0]] = [row[1], row[2], row[3], row[4]]
         conn.close()
 
-    def random_click(self, topleft, bottomright, windowname):
+    def random_click(self, topleft, bottomright):
         """计算并随机点击绝对坐标范围内的某个点"""
         tl = topleft
         br = bottomright
-        wx, wy = self.get_window_coordinate(windowname)
+        wx, wy = self.get_window_coordinate()
         x = random.randrange(tl[0], br[0])
         y = random.randrange(tl[1], br[1])
         pyautogui.click(x + wx, y + wy)
 
-    def get_window_coordinate(self, windowname):
+    def get_window_coordinate(self):
         """得到窗口左上角坐标"""
-        hwnd = win32gui.FindWindow(0, windowname)
+        hwnd = win32gui.FindWindow(0, self.windowname)
         rect = win32gui.GetWindowRect(hwnd)
         x = rect[0]
         y = rect[1]
         return x, y
 
-    def grab_window(self, windowname):
+    def grab_window(self):
         """截图窗口可以被遮挡 操作要置顶 不能最小化"""
         print(99)
-        hwnd = win32gui.FindWindow(0, windowname)
+        hwnd = win32gui.FindWindow(0, self.windowname)
         # win32gui.SetForegroundWindow(hwnd)
         screen = QApplication.primaryScreen()
         qimage = screen.grabWindow(hwnd).toImage()
@@ -347,7 +348,7 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, Ui_load_file_1.Ui_LoadFile):
         self.loopend = 0
             
         while True:
-            self.image = self.grab_window(self.windowname)
+            self.image = self.grab_window()
             self.mode = self.id_dict[self.id][1]
             self.path = self.id_dict[self.id][0]
             self.loopid = self.id_dict[self.id][2]
@@ -369,7 +370,7 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, Ui_load_file_1.Ui_LoadFile):
                     self.id = self.loopend
 
             if min_val == 0:
-                self.random_click(tl, br, self.windowname)
+                self.random_click(tl, br)
                 self.click_times += 1
             if min_val != 0 and self.click_times != 0:
                 self.click_times = 0

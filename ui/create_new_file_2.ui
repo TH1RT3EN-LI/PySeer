@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CreateNewFile</class>
+ <widget class="QWidget" name="CreateNewFile">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>320</width>
+    <height>240</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>320</width>
+    <height>240</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>320</width>
+    <height>240</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <family>微软雅黑</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>80</y>
+     <width>261</width>
+     <height>122</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QPushButton" name="pushButton_1">
+        <property name="text">
+         <string>添加目标</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>添加目标【循环开始】</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="text">
+         <string>添加目标【循环中】</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_4">
+        <property name="text">
+         <string>添加目标【循环结束】</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPushButton" name="pushButton_5">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>210</y>
+     <width>81</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>完成</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>50</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>获取屏幕</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>10</y>
+     <width>251</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>窗口名：</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="lineEdit"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>CreateNewFile</receiver>
+   <slot>btn_clicked_2()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>263</x>
+     <y>137</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>259</x>
+     <y>125</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_1</sender>
+   <signal>clicked()</signal>
+   <receiver>CreateNewFile</receiver>
+   <slot>btn_clicked_1()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>269</x>
+     <y>82</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>262</x>
+     <y>93</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>CreateNewFile</receiver>
+   <slot>get_windowname()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>169</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>172</x>
+     <y>17</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>CreateNewFile</receiver>
+   <slot>grab_window()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>175</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>121</x>
+     <y>59</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>CreateNewFile</receiver>
+   <slot>btn_clicked_3()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>233</x>
+     <y>152</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>221</x>
+     <y>152</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>CreateNewFile</receiver>
+   <slot>btn_clicked_4()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>187</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_5</sender>
+   <signal>clicked()</signal>
+   <receiver>CreateNewFile</receiver>
+   <slot>btn_clicked_5()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>267</x>
+     <y>220</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <signal>signal1()</signal>
+  <slot>btn_clicked_2()</slot>
+  <slot>get_windowname()</slot>
+  <slot>btn_clicked_1()</slot>
+  <slot>grab_window()</slot>
+  <slot>btn_clicked_3()</slot>
+  <slot>btn_clicked_4()</slot>
+  <slot>btn_clicked_5()</slot>
+ </slots>
+</ui>

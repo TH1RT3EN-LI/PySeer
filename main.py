@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QImage
-from PIL import ImageQt
+from PIL import ImageQt, Image
 import win32gui
 import sys
+import os
 import numpy as np
 import cv2
 import pyautogui
@@ -36,15 +37,7 @@ def matching_target(icon, image):
     tl = min_loc
     br = (tl[0] + target_width, tl[1] + target_height)
     return tl, br, min_val
-    # # cv_imshow(interface, tl, br)
-    # # if min_val != 0 and click_times > 0:
-    # #     click_times = 0
 
-    # #     location += 1
-    # if min_val == 0:
-    #     print(f' 目标相对左上坐标为{tl}, 相对右下坐标为{br}')
-    #     random_click(tl, br, windowname, click_times, location)
-    
 
 
 def cv_imshow(interface, topleft, bottomright):
@@ -72,6 +65,34 @@ def get_window_coordinate(windowname):
     return x, y
 
 
+# def load_default_file(path):
+
+
+def creat_new_file(filename):
+    abspath = sys.path[0]
+    with open(abspath + '\\default_files\\' + filename + '.txt', 'a') as f:
+        f.write()
+
+
+
+def select_target(image, id):
+    # image=cv2.imread(r'F:\PYTHON\PySeer\target\ad enter.png')
+    # cv2.namedWindow('img')
+    r = cv2.selectROI('roi', image, True, False)
+    # print(r)
+    img_roi = image[int(r[1]):int(r[1]+r[3]),int(r[0]):int(r[0]+r[2])]
+    # print(img_roi) 
+    # cv2.imshow("imageHSV",img_roi)
+    img_pil = Image.fromarray(cv2.cvtColor(img_roi, cv2.COLOR_BGR2RGB))
+    abspath = sys.path[0]
+    if not os.path.exists(abspath + '\\target\\'):
+        os.makedirs(abspath + '\\target\\')
+    else:
+        img_pil.save(abspath + '\\target\\' + str(id) + '.png')
+    cv2.waitKey(0)
+    return (abspath + '\\target\\' + str(id) + '.png')
+
+
 def run():
     """开始"""
     settings = Settings()
@@ -91,6 +112,9 @@ def run():
         #     cv2.destroyAllWindows()
         #     break
 
+def creat():
+    """新建"""
+    creat_new_file('学习力')
 
 if __name__ == "__main__":
     run()

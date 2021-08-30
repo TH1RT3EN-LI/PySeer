@@ -341,49 +341,41 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, Ui_load_file_1.Ui_LoadFile):
     def btn_clicked_1(self):
         self.save_to_dict()
         self.id = 1
-        self.click_success = 1
         self.click_times = 0
         self.max_id = len(self.id_dict)
-        print(1)
+        self.loopstart = 0
+        self.loopend = 0
+            
         while True:
-            print(2)
             self.image = self.grab_window(self.windowname)
-            if self.click_success == 1:
-                print(self.id_dict)
-                
-                self.mode = self.id_dict[self.id][1]
-                self.path = self.id_dict[self.id][0]
-                self.loopid = self.id_dict[self.id][2]
-                self.looptimes = self.id_dict[self.id][3]
-                self.loopstart = 0
-                self.loopend = 0
-                if self.mode == 0:
-                    tl, br, min_val = self.matching_target(self.path, self.image)
-                    id += 1
-                if self.mode == 1:
-                    tl, br, min_val = self.matching_target(self.path, self.image)
-                    loopstart = self.id
-                if self.mode == 2:
-                    loopend = self.id
-                    tl, br, min_val = self.matching_target(self.path, self.image)
-                    if self.looptimes > 0:
-                        self.looptimes -= 1
-                        id = loopstart
-                    if self.looptimes == 0:
-                        id = loopend
-            else:
-                print(4)
-                pass
+            self.mode = self.id_dict[self.id][1]
+            self.path = self.id_dict[self.id][0]
+            self.loopid = self.id_dict[self.id][2]
+            self.looptimes = self.id_dict[self.id][3]
+            
+            if self.mode == 0:
+                tl, br, min_val = self.matching_target(self.path, self.image)
+                self.d += 1
+            if self.mode == 1:
+                tl, br, min_val = self.matching_target(self.path, self.image)
+                self.loopstart = self.id
+            if self.mode == 2:
+                self.loopend = self.id
+                tl, br, min_val = self.matching_target(self.path, self.image)
+                if self.looptimes > 0:
+                    self.looptimes -= 1
+                    self.id = self.loopstart
+                if self.looptimes == 0:
+                    self.id = self.loopend
+
             if min_val == 0:
                 self.random_click(tl, br, self.windowname)
                 self.click_times += 1
             if min_val != 0 and self.click_times != 0:
                 self.click_times = 0
-                self.click_success = 1
             if self.id > self.max_id:
                 break
-        print(5)
-            
+
 
 if __name__ == '__main__':
     app = PyQt5.QtWidgets.QApplication(sys.argv)

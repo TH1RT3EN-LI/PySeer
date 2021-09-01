@@ -43,7 +43,7 @@
     <string>开始</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -79,8 +79,8 @@
    <slot>update_text()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>63</x>
-     <y>41</y>
+     <x>119</x>
+     <y>58</y>
     </hint>
     <hint type="destinationlabel">
      <x>161</x>
@@ -99,8 +99,8 @@
      <y>146</y>
     </hint>
     <hint type="destinationlabel">
-     <x>147</x>
-     <y>202</y>
+     <x>232</x>
+     <y>141</y>
     </hint>
    </hints>
   </connection>

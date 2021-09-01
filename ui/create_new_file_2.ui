@@ -59,13 +59,6 @@
       <item>
        <widget class="QPushButton" name="pushButton_3">
         <property name="text">
-         <string>添加目标【循环中】</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_4">
-        <property name="text">
          <string>添加目标【循环结束】</string>
         </property>
        </widget>
@@ -74,7 +67,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QPushButton" name="pushButton_5">
+  <widget class="QPushButton" name="pushButton_4">
    <property name="geometry">
     <rect>
      <x>230</x>
@@ -149,7 +142,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>269</x>
-     <y>82</y>
+     <y>89</y>
     </hint>
     <hint type="destinationlabel">
      <x>262</x>
@@ -190,42 +183,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_3</sender>
-   <signal>clicked()</signal>
-   <receiver>CreateNewFile</receiver>
-   <slot>btn_clicked_3()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>233</x>
-     <y>152</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>221</x>
-     <y>152</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>pushButton_4</sender>
    <signal>clicked()</signal>
    <receiver>CreateNewFile</receiver>
    <slot>btn_clicked_4()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>251</x>
-     <y>185</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>240</x>
-     <y>187</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_5</sender>
-   <signal>clicked()</signal>
-   <receiver>CreateNewFile</receiver>
-   <slot>btn_clicked_5()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>267</x>
@@ -234,6 +195,22 @@
     <hint type="destinationlabel">
      <x>252</x>
      <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>CreateNewFile</receiver>
+   <slot>btn_clicked_3()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>139</x>
+     <y>175</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>97</x>
+     <y>206</y>
     </hint>
    </hints>
   </connection>

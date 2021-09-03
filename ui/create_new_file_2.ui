@@ -30,36 +30,58 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>80</y>
-     <width>261</width>
-     <height>122</height>
+     <x>10</x>
+     <y>50</y>
+     <width>301</width>
+     <height>126</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QPushButton" name="pushButton_1">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QPushButton" name="pushButton_1">
+          <property name="text">
+           <string>添加目标</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="text">
+           <string>添加目标【循环开始】</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_3">
+          <property name="text">
+           <string>添加目标【循环结束】</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="pushButton_5">
         <property name="text">
-         <string>添加目标</string>
+         <string>撤销</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_2">
+      <item row="0" column="1">
+       <widget class="QPushButton" name="pushButton_4">
         <property name="text">
-         <string>添加目标【循环开始】</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_3">
-        <property name="text">
-         <string>添加目标【循环结束】</string>
+         <string>完成</string>
         </property>
        </widget>
       </item>
@@ -67,51 +89,36 @@
     </item>
    </layout>
   </widget>
-  <widget class="QPushButton" name="pushButton_4">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>210</y>
-     <width>81</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>完成</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>50</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>获取屏幕</string>
-   </property>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
      <x>40</x>
      <y>10</y>
-     <width>251</width>
-     <height>25</height>
+     <width>272</width>
+     <height>27</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>窗口名：</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>窗口名：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit"/>
+      </item>
+     </layout>
     </item>
     <item>
-     <widget class="QLineEdit" name="lineEdit"/>
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>获取屏幕</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -189,8 +196,8 @@
    <slot>btn_clicked_4()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>267</x>
-     <y>220</y>
+     <x>201</x>
+     <y>189</y>
     </hint>
     <hint type="destinationlabel">
      <x>252</x>
@@ -205,12 +212,28 @@
    <slot>btn_clicked_3()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>139</x>
-     <y>175</y>
+     <x>112</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>97</x>
      <y>206</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_5</sender>
+   <signal>clicked()</signal>
+   <receiver>CreateNewFile</receiver>
+   <slot>btn_clicked_5()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>143</x>
+     <y>194</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>143</x>
+     <y>211</y>
     </hint>
    </hints>
   </connection>

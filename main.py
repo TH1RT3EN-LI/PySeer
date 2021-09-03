@@ -31,18 +31,18 @@ class MainWindow(PyQt5.QtWidgets.QMainWindow, ui.Ui_mainwindow.Ui_MainWindow):
         self.setWindowlocation()
 
     def setWindowlocation(self):
-        '''设置窗口位置于屏幕右上角'''
+        """设置窗口位置于屏幕右上角"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
         self.move(int(screen.width() - size.width()), 60)
 
     def btn_clicked(self):
-        '''反馈新建按钮'''
+        """新建"""
         self.cnfa = CreateNewFileA()
         self.cnfa.show()
 
     def btn_clicked_2(self):
-        '''反馈加载按钮'''
+        """加载"""
         self.lfa = LoadFileA()
         self.lfa.show()
 
@@ -56,17 +56,17 @@ class CreateNewFileA(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_1.Ui_CreateN
         self.setWindowlocation()
 
     def setWindowlocation(self):
-        '''设置窗口位置于屏幕右上角'''
+        """设置窗口位置于屏幕右上角"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
         self.move(int(screen.width() - size.width()), 60)
 
     def update_text(self):
-        '''实时更新脚本名'''
+        """实时更新脚本名"""
         self.text = self.lineEdit.text()
 
     def create_new_file(self):
-        '''创建数据库存储脚本信息'''
+        """创建数据库存储脚本信息"""
         abspath = sys.path[0]
         if os.path.exists(abspath + '\\default_files\\') is False:
             os.makedirs(abspath + '\\default_files\\')
@@ -90,7 +90,7 @@ class CreateNewFileA(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_1.Ui_CreateN
         return dbpath
 
     def btn_clicked(self):
-        '''反馈开始按钮'''
+        """开始"""
         self.cnfb = CreateNewFileB()
         self.cnfb.dbpath = self.create_new_file()
         self.cnfb.filename = self.text
@@ -113,13 +113,13 @@ class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateN
         self.setWindowlocation()
 
     def setWindowlocation(self):
-        '''设置窗口位置于屏幕右上角'''
+        """设置窗口位置于屏幕右上角"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
         self.move(int(screen.width() - size.width()), 60)
 
     def btn_clicked_1(self):
-        '''添加目标'''
+        """添加目标"""
         self.mode = 0
         self.cnfd.show()
         self.pngpath = self.select_target(self.id, self.filename)
@@ -130,8 +130,8 @@ class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateN
             self.id += 1
 
     def btn_clicked_2(self):
-        '''添加目标 循环开始'''
-        self.cnfc = CreateNewFileC()
+        """添加目标 循环开始"""
+        self.cnfc = CreateNewFileC(self.cnfd)
         self.cnfc._signal.connect(self.set_looptimes)
         self.mode = 1
         self.cnfd.show()
@@ -140,13 +140,12 @@ class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateN
         if self.pngpath == 'NO':
             pass
         else:
-            # self.cnfc.setWindowModality(QtCore.Qt.ApplicationModal)
             self.insert_into_file(self.dbpath, self.pngpath, self.id, self.mode,
                                   self.looptimes)
             self.id += 1
     
     def btn_clicked_3(self):
-        '''添加目标 循环结束'''
+        """添加目标 循环结束"""
         self.mode = 2
         self.cnfd.show()
         self.pngpath = self.select_target(self.id, self.filename)
@@ -158,22 +157,37 @@ class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateN
             self.id += 1
 
     def btn_clicked_4(self):
-        '''完成'''
+        """完成"""
         self.looptimes = 2
         self.id = 1
         os.remove(r'PySeer\cache.png')
         self.close()
 
+    def btn_clicked_5(self):
+        """撤销"""
+        self.id -= 1
+        self.delete_db(self.dbpath, self.id)
+        os.remove('PySeer\\target\\' + self.filename + '\\' + str(self.id) + '.png')
+        
+
+
+    def delete_db(self, dbpath, id):
+        """删除数据库文件的最后一项"""
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
+        c.execute(f"DELETE from PYSEER where ID={id}")
+        conn.commit()
+        conn.close()
+
     def set_looptimes(self, loop):
-        '''设置循环次数'''
+        """设置循环次数"""
         self.looptimes = loop
     
     def get_windowname(self):
-        '''获取目标窗口名'''
+        """获取目标窗口名"""
         self.windowname = self.lineEdit.text()
     
     def insert_into_file(self, dbpath, pngpath, id, mode, looptimes=0):
-        print(self.looptimes)
         conn = sqlite3.connect(dbpath)
         c = conn.cursor()
         c.execute(f"INSERT INTO PYSEER (ID, PATH, MODE, LOOPTIMES) \
@@ -191,7 +205,7 @@ class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateN
         image.save(r'PySeer\cache.png')
 
     def select_target(self, id, filename):
-        '''用selectROI选择目标并保存'''
+        """用selectROI选择目标并保存"""
         image = cv2.imread(r'PySeer\cache.png')
         r = cv2.selectROI('ROI', image, True, False)
         if r == (0, 0, 0, 0):
@@ -213,22 +227,45 @@ class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateN
 
 class CreateNewFileC(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_3.Ui_CreateNewFile):
     _signal = QtCore.pyqtSignal(int)
-    def __init__(self):
+    def __init__(self, cnfd):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('TH1RT3EN PySeer')
         self.setWindowlocation()
+        self.cnfd = cnfd
 
     def setWindowlocation(self):
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
         self.move(int(screen.width() - size.width()), 60)
 
-    def get_loop_times(self):
-        '''向上一个窗口传递输入的字符串'''
-        self._signal.emit(int(self.lineEdit.text()))
+    def btn_clicked_1(self):
+        """保存"""
+        # 向上一个窗口传递参数
+        try:
+            self._signal.emit(int(self.lineEdit.text()))
+            self.cnfd.btn_clicked_1()
+            self.cnfd.close()
+            self.close()
+        # 如果输入值错误，返回ValueError无法提交
+        except ValueError:
+            pass
+        
+    
+    def btn_clicked_2(self):
+        """取消"""
+        self.cnfd.btn_clicked_2()
+        self.cnfd.close()
         self.close()
 
+    def get_loop_times(self):
+        """向上一个窗口传递输入的字符串"""
+        try:
+            self._signal.emit(int(self.lineEdit.text()))
+        except ValueError:
+           self.cnfd.btn_clicked_2()
+           self.cnfd.close()
+        self.close()
 
 class CreateNewFileD(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_4.Ui_CreateNewFile):
     def __init__(self):
@@ -243,7 +280,7 @@ class CreateNewFileD(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_4.Ui_CreateN
         self.move(int(screen.width() - size.width()), 60)
     
     def btn_clicked_1(self):
-        '''两次点击空格 保存roi选择区域'''
+        """两次点击空格 保存roi选择区域"""
         self.hwnd = win32gui.FindWindow(0, 'ROI')
         win32api.PostMessage(self.hwnd, win32con.WM_KEYDOWN, win32con.VK_SPACE, 0)
         win32api.PostMessage(self.hwnd, win32con.WM_KEYUP, win32con.VK_SPACE, 0)
@@ -252,7 +289,7 @@ class CreateNewFileD(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_4.Ui_CreateN
         self.close()
 
     def btn_clicked_2(self):
-        '''两次点击c 取消本次roi选择'''
+        """两次点击c 取消本次roi选择"""
         self.hwnd = win32gui.FindWindow(0, 'ROI')
         win32api.PostMessage(self.hwnd, win32con.WM_KEYDOWN, 0x43, 0)
         win32api.PostMessage(self.hwnd, win32con.WM_KEYUP, 0x43, 0)
@@ -277,15 +314,15 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
         self.move(int(screen.width() - size.width()), 60)
 
     def update_dbpath(self):
-        '''获取输入的数据库文件路径'''
+        """获取输入的数据库文件路径"""
         self.dbpath = self.lineEdit.text()
 
     def update_windowname(self):
-        '''获取输入的窗口名'''
+        """获取输入的窗口名"""
         self.windowname = self.lineEdit_2.text()
 
     def save_to_dict(self):
-        '''读取数据库表格并存储于字典'''
+        """读取数据库表格并存储于字典"""
         conn = sqlite3.connect(self.dbpath)
         c = conn.cursor()
         cursor = c.execute("SELECT ID, PATH, MODE, LOOPTIMES from PYSEER")
@@ -338,12 +375,12 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
         return tl, br, min_val
     
     def prevent_sleep(self):
-        '''防止休眠'''
+        """防止休眠"""
         x1, y1, x2, y2 = self.get_window_coordinate()
         pyautogui.click((x2 - x1) / 2, y1 + 50)
 
     def btn_clicked_1(self):
-        '''开始加载文件，匹配目标并点击'''
+        """开始加载文件，匹配目标并点击"""
         self.save_to_dict()
         self.id = 1
         self.click_times = 0

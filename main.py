@@ -330,23 +330,25 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
             self.id_dict[row[0]] = [row[1], row[2], row[3]]
         conn.close()
 
-    def random_click(self, topleft, bottomright):
-        """计算并随机点击绝对坐标范围内的某个点"""
+    def center_click(self, topleft, bottomright):
+        """计算并点击矩形中点"""
         tl = topleft
         br = bottomright
         x1, y1, x2, y2= self.get_window_coordinate()
-        x = random.randrange(tl[0], br[0])
-        y = random.randrange(tl[1], br[1])
-        pyautogui.click(x + x1, y + y1)
+        x = (tl[0] + br[0])/2
+        y = (tl[1] + br[1])/2
+        # 30是窗口栏宽度
+        pyautogui.click(x + x1, y + y1 + 30)
 
     def get_window_coordinate(self):
         """得到窗口左上角坐标"""
         hwnd = win32gui.FindWindow(0, self.windowname)
         rect = win32gui.GetWindowRect(hwnd)
-        x1 = rect[0]
+        x1 = rect[0] + 8
         y1 = rect[1]
-        x2 = rect[2]
+        x2 = rect[2] + 8
         y2 = rect[3]
+        print(x1, y1, x2, y2)
         return x1, y1, x2, y2
 
     def grab_window(self):
@@ -362,22 +364,21 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
     def matching_target(self, icon, image):
         """匹配图片 返回相对坐标"""
         screen = np.array(image)
-        interface = cv2.cvtColor(screen, cv2.COLOR_BGR2RGB)
+        img_gray = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
         # target路径不能有中文
-        target = cv2.imread(icon)
-        methods = cv2.TM_SQDIFF_NORMED
+        target = cv2.imread(icon, 0)
         target_height, target_width = target.shape[:2]
-        result = cv2.matchTemplate(interface, target, methods)
+        result = cv2.matchTemplate(img_gray, target, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-        # topleft/ bottomright
-        tl = min_loc
+        # # topleft/ bottomright
+        tl = max_loc
         br = (tl[0] + target_width, tl[1] + target_height)
-        return tl, br, min_val
+        return tl, br, max_val
     
-    def prevent_sleep(self):
-        """防止休眠"""
-        x1, y1, x2, y2 = self.get_window_coordinate()
-        pyautogui.click((x2 - x1) / 2, y1 + 50)
+    # def prevent_sleep(self):
+    #     """防止休眠"""
+    #     x1, y1, x2, y2 = self.get_window_coordinate()
+    #     pyautogui.click((x2 - x1) / 2, y1 + 50)
 
     def btn_clicked_1(self):
         """开始加载文件，匹配目标并点击"""
@@ -389,17 +390,20 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
         self.current_looptimes = 0
 
         while True:
+            print(1)
             self.image = self.grab_window()
             self.mode = self.id_dict[self.id][1]
             self.path = self.id_dict[self.id][0]
             self.looptimes = self.id_dict[self.id][2]
 
-            tl, br, min_val = self.matching_target(self.path, self.image)
-
-            if min_val == 0:
-                self.random_click(tl, br)
+            tl, br, max_val = self.matching_target(self.path, self.image)
+            if max_val >= 0.98:
+                self.center_click(tl, br)
+                x, y = pyautogui.position()
+                print(tl, x, ',', y)
+                
                 self.click_times += 1
-            if min_val != 0 and self.click_times != 0:
+            if max_val <=0.98 and self.click_times != 0:
                 self.click_times = 0
 
                 if self.mode == 0:
@@ -413,8 +417,7 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
                 if self.mode == 2 and self.current_looptimes == self.looptimes:
                     self.id += 1
                     self.current_looptimes = 0
-            if min_val != 0 and self.click_times == 0:
-                self.prevent_sleep(self)
+
             if self.id > self.max_id:
                 break
 

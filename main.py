@@ -1,6 +1,7 @@
 # 自带库
 import os
 import time
+import random
 import sqlite3
 import sys
 # 第三方库
@@ -225,7 +226,7 @@ class CreateNewFileB(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_2.Ui_Cre
             return (abspath + '\\target\\' + filename + '\\' + str(id) + '.png')
 
 
-class CreateNewFileC(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_3.Ui_CreateNewFile):
+class CreateNewFileC(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_3.Ui_CreateNewFile):
     _signal = QtCore.pyqtSignal(int)
     def __init__(self, cnfd):
         super().__init__()
@@ -299,6 +300,7 @@ class CreateNewFileD(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_4.Ui_CreateN
 
 
 class LoadFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_load_file_1.Ui_LoadFile):
+    
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -329,11 +331,6 @@ class LoadFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_load_file_1.Ui_LoadFile):
     def update_windowname(self):
         """获取输入的窗口名"""
         self.windowname = self.lineEdit_2.text()
-    
-    def prevent_sleep(self):
-        """防止休眠"""
-        x1, y1, x2, y2 = self.get_window_coordinate()
-        pyautogui.click((x2 - x1) / 2, y1 + 80)
 
     def update_statusbar(self, statusbar):
         """更新指定QLabel的内容"""
@@ -353,7 +350,25 @@ class LoadFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_load_file_1.Ui_LoadFile):
 
         self.threada = ThreadA(self.windowname, self.dbpath)
         self.threada.start()
+        self.threadb = ThreadB(self.windowname)
+        self.threadb.start()
         self.threada._signal.connect(self.update_statusbar)
+
+    def checkbox_1_clicked(self):
+        """开启防止休眠"""
+        global ps
+        if self.checkBox_1.isChecked():
+            ps =  True
+        else:
+            ps = False
+
+    def checkbox_2_clicked(self):
+        """开启随机点击"""
+        global rc
+        if self.checkBox_2.isChecked():
+            rc = True
+        else:
+            rc = False
 
 
 
@@ -376,15 +391,17 @@ class ThreadA(QtCore.QThread):
             self.id_dict[row[0]] = [row[1], row[2], row[3]]
         conn.close()
 
-    def center_click(self, topleft, bottomright):
-        """计算并点击矩形中点"""
-        tl = topleft
-        br = bottomright
+    def mouse_click(self, tl, br):
+        """计算并点击匹配成功区域/中心"""
         x1, y1, x2, y2= self.get_window_coordinate()
-        x = (tl[0] + br[0])/2
-        y = (tl[1] + br[1])/2
         # 30是窗口栏宽度
-        pyautogui.click(x + x1, y + y1 + 30)
+        if rc:
+            pyautogui.click(random.randrange(tl[0], br[0]) + x1,
+                            random.randrange(tl[1], br[1]) + y1 + 30)
+        else:
+            x = (tl[0] + br[0])/2
+            y = (tl[1] + br[1])/2
+            pyautogui.click(x + x1, y + y1 + 30)
 
     def get_window_coordinate(self):
         """得到窗口左上角坐标"""
@@ -434,23 +451,16 @@ class ThreadA(QtCore.QThread):
         self.loopstart = 0
         self.current_looptimes = 0
 
-        while True:
-            if self.id > self.max_id:
-                time.sleep(2)
-                self.statusbar['status'] = '已完成'
-                self.statusbar['mode'] = '-----'
-                self._signal.emit(self.statusbar)
-                break
-            
+        while True:  
             self.image = self.grab_window()
             self.mode = self.id_dict[self.id][1]
             self.path = self.id_dict[self.id][0]
             self.looptimes = self.id_dict[self.id][2]
-            print(self.path, self.mode, self.id, self.looptimes)
+
             tl, br, max_val = self.matching_target(self.path, self.image)
 
             if max_val >= 0.97:
-                self.center_click(tl, br)
+                self.mouse_click(tl, br)
                 self.click_times += 1
 
             if max_val <= 0.97 and self.click_times != 0:
@@ -482,7 +492,39 @@ class ThreadA(QtCore.QThread):
                     if self.current_looptimes == self.looptimes:
                         self.current_looptimes = 0
                         self.loopstart = 0
-                    
+
+            if self.id > self.max_id:
+                time.sleep(2)
+                self.statusbar['status'] = '已完成'
+                self.statusbar['mode'] = '-----'
+                self._signal.emit(self.statusbar)
+                break
+
+
+class ThreadB(QtCore.QThread):
+    def __init__(self, windowname):
+        super().__init__()
+        self.windowname = windowname
+
+    def get_window_coordinate(self):
+        """得到窗口左上角坐标"""
+        hwnd = win32gui.FindWindow(0, self.windowname)
+        rect = win32gui.GetWindowRect(hwnd)
+        x1 = rect[0] + 8
+        y1 = rect[1]
+        x2 = rect[2] + 8
+        y2 = rect[3]
+        return x1, y1, x2, y2
+    
+    def prevent_sleep(self):
+        """随机移动鼠标防止休眠"""
+        x1, y1, x2, y2 = self.get_window_coordinate()
+        pyautogui.moveTo(random.randrange(x1, x2), random.randrange(y1, y2))
+    
+    def run(self):
+        while ps:
+            self.prevent_sleep()
+
 
 if __name__ == '__main__':
     app = PyQt5.QtWidgets.QApplication(sys.argv)

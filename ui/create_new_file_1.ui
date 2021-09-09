@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>CreateNewFile</class>
- <widget class="QWidget" name="CreateNewFile">
+ <widget class="QMainWindow" name="CreateNewFile">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -22,53 +22,61 @@
     <height>240</height>
    </size>
   </property>
-  <property name="font">
-   <font>
-    <family>微软雅黑</family>
-   </font>
-  </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>MainWindow</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>291</width>
+      <height>58</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>脚本名：</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit"/>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>100</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>开始</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>120</y>
-     <width>91</width>
-     <height>41</height>
+     <x>0</x>
+     <y>0</y>
+     <width>320</width>
+     <height>23</height>
     </rect>
    </property>
-   <property name="text">
-    <string>开始</string>
-   </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>40</y>
-     <width>291</width>
-     <height>58</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>脚本名：</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="lineEdit"/>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections>
@@ -79,12 +87,12 @@
    <slot>update_text()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
-     <y>58</y>
+     <x>267</x>
+     <y>62</y>
     </hint>
     <hint type="destinationlabel">
-     <x>161</x>
-     <y>5</y>
+     <x>168</x>
+     <y>38</y>
     </hint>
    </hints>
   </connection>
@@ -95,19 +103,18 @@
    <slot>btn_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>129</x>
-     <y>146</y>
+     <x>141</x>
+     <y>140</y>
     </hint>
     <hint type="destinationlabel">
-     <x>232</x>
-     <y>141</y>
+     <x>88</x>
+     <y>131</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>update_text()</slot>
-  <slot>create_new_file()</slot>
   <slot>btn_clicked()</slot>
  </slots>
 </ui>

@@ -1,6 +1,6 @@
 # 自带库
 import os
-import random
+import time
 import sqlite3
 import sys
 # 第三方库
@@ -47,7 +47,7 @@ class MainWindow(PyQt5.QtWidgets.QMainWindow, ui.Ui_mainwindow.Ui_MainWindow):
         self.lfa.show()
 
 
-class CreateNewFileA(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_1.Ui_CreateNewFile):
+class CreateNewFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_1.Ui_CreateNewFile):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -98,14 +98,14 @@ class CreateNewFileA(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_1.Ui_CreateN
         self.close()
         
 
-class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateNewFile):
+class CreateNewFileB(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_2.Ui_CreateNewFile):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('TH1RT3EN PySeer')
         self.windowname = ''
         self.filename = ''
-        self.looptimes = 2
+        self.looptimes = 0
         self.id = 1
         self.dbpath = ''
         self.pngpath = ''
@@ -126,7 +126,8 @@ class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateN
         if self.pngpath == 'NO':
             pass
         else:
-            self.insert_into_file(self.dbpath, self.pngpath, self.id, self.mode)
+            self.insert_into_file(self.dbpath, self.pngpath, self.id, self.mode,
+                                  self.looptimes)
             self.id += 1
 
     def btn_clicked_2(self):
@@ -155,10 +156,11 @@ class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateN
             self.insert_into_file(self.dbpath, self.pngpath, self.id, self.mode,
                                   self.looptimes)
             self.id += 1
+            self.looptimes = 0
 
     def btn_clicked_4(self):
         """完成"""
-        self.looptimes = 2
+        self.looptimes = 0
         self.id = 1
         os.remove(r'PySeer\cache.png')
         self.close()
@@ -169,8 +171,6 @@ class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateN
         self.delete_db(self.dbpath, self.id)
         os.remove('PySeer\\target\\' + self.filename + '\\' + str(self.id) + '.png')
         
-
-
     def delete_db(self, dbpath, id):
         """删除数据库文件的最后一项"""
         conn = sqlite3.connect(dbpath)
@@ -187,7 +187,7 @@ class CreateNewFileB(PyQt5.QtWidgets.QWidget, ui.Ui_create_new_file_2.Ui_CreateN
         """获取目标窗口名"""
         self.windowname = self.lineEdit.text()
     
-    def insert_into_file(self, dbpath, pngpath, id, mode, looptimes=0):
+    def insert_into_file(self, dbpath, pngpath, id, mode, looptimes):
         conn = sqlite3.connect(dbpath)
         c = conn.cursor()
         c.execute(f"INSERT INTO PYSEER (ID, PATH, MODE, LOOPTIMES) \
@@ -298,7 +298,7 @@ class CreateNewFileD(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_4.Ui_CreateN
         self.close()
 
 
-class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
+class LoadFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_load_file_1.Ui_LoadFile):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -307,8 +307,17 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
         self.id_dict = {}
         self.windowname = ''
         self.setWindowlocation()
+        self.initUi()
+ 
+    def initUi(self):
+        self.status = self.statusBar()
+        self.lf_status = PyQt5.QtWidgets.QLabel('状态： 未运行')
+        self.lf_mode = PyQt5.QtWidgets.QLabel('模式： -----')
+        self.status.addPermanentWidget(self.lf_status, stretch=5)
+        self.status.addPermanentWidget(self.lf_mode, stretch=5)
 
     def setWindowlocation(self):
+        """设置窗口位置"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
         self.move(int(screen.width() - size.width()), 60)
@@ -320,6 +329,43 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
     def update_windowname(self):
         """获取输入的窗口名"""
         self.windowname = self.lineEdit_2.text()
+    
+    def prevent_sleep(self):
+        """防止休眠"""
+        x1, y1, x2, y2 = self.get_window_coordinate()
+        pyautogui.click((x2 - x1) / 2, y1 + 80)
+
+    def update_statusbar(self, statusbar):
+        """更新指定QLabel的内容"""
+        self.lf_status.setText('状态： ' + statusbar['status'])
+        self.lf_mode.setText('模式： ' + statusbar['mode'])
+        self.lf_status.repaint()
+        self.lf_mode.repaint()
+        print(statusbar)
+        
+    def btn_clicked_1(self):
+        """执行子线程 更新状态栏"""
+        self.id = 1
+        self.click_times = 0
+        self.max_id = len(self.id_dict)
+        self.loopstart = 0
+        self.current_looptimes = 0
+
+        self.threada = ThreadA(self.windowname, self.dbpath)
+        self.threada.start()
+        self.threada._signal.connect(self.update_statusbar)
+
+
+
+class ThreadA(QtCore.QThread):
+    _signal = QtCore.pyqtSignal(dict)
+
+    def __init__(self, windowname, dbpath):
+        super().__init__()
+        self.dbpath = dbpath
+        self.id_dict = {}
+        self.statusbar = {'status':'', 'mode':''}
+        self.windowname = windowname
 
     def save_to_dict(self):
         """读取数据库表格并存储于字典"""
@@ -348,7 +394,6 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
         y1 = rect[1]
         x2 = rect[2] + 8
         y2 = rect[3]
-        print(x1, y1, x2, y2)
         return x1, y1, x2, y2
 
     def grab_window(self):
@@ -364,25 +409,25 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
     def matching_target(self, icon, image):
         """匹配图片 返回相对坐标"""
         screen = np.array(image)
-        img_gray = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
+        img_rgb = cv2.cvtColor(screen, cv2.COLOR_BGR2RGB)
         # target路径不能有中文
-        target = cv2.imread(icon, 0)
+        target = cv2.imread(icon)
         target_height, target_width = target.shape[:2]
-        result = cv2.matchTemplate(img_gray, target, cv2.TM_CCOEFF_NORMED)
+        result = cv2.matchTemplate(img_rgb, target, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
         # # topleft/ bottomright
         tl = max_loc
         br = (tl[0] + target_width, tl[1] + target_height)
+        # print(min_val, max_val, min_loc, max_loc)
         return tl, br, max_val
-    
-    # def prevent_sleep(self):
-    #     """防止休眠"""
-    #     x1, y1, x2, y2 = self.get_window_coordinate()
-    #     pyautogui.click((x2 - x1) / 2, y1 + 50)
 
-    def btn_clicked_1(self):
-        """开始加载文件，匹配目标并点击"""
+    def run(self):
+        self.statusbar['status'] = '运行中'
+        self.statusbar['mode'] = '-----'
+        self._signal.emit(self.statusbar)
+
         self.save_to_dict()
+
         self.id = 1
         self.click_times = 0
         self.max_id = len(self.id_dict)
@@ -390,37 +435,54 @@ class LoadFileA(PyQt5.QtWidgets.QWidget, ui.Ui_load_file_1.Ui_LoadFile):
         self.current_looptimes = 0
 
         while True:
-            print(1)
+            if self.id > self.max_id:
+                time.sleep(2)
+                self.statusbar['status'] = '已完成'
+                self.statusbar['mode'] = '-----'
+                self._signal.emit(self.statusbar)
+                break
+            
             self.image = self.grab_window()
             self.mode = self.id_dict[self.id][1]
             self.path = self.id_dict[self.id][0]
             self.looptimes = self.id_dict[self.id][2]
-
+            print(self.path, self.mode, self.id, self.looptimes)
             tl, br, max_val = self.matching_target(self.path, self.image)
-            if max_val >= 0.98:
+
+            if max_val >= 0.97:
                 self.center_click(tl, br)
-                x, y = pyautogui.position()
-                print(tl, x, ',', y)
-                
                 self.click_times += 1
-            if max_val <=0.98 and self.click_times != 0:
+
+            if max_val <= 0.97 and self.click_times != 0:
                 self.click_times = 0
 
                 if self.mode == 0:
+                    if self.loopstart == 0:
+                        self.statusbar['mode'] = '顺序'
+                        self._signal.emit(self.statusbar)
                     self.id += 1
+    
                 if self.mode == 1:
                     self.loopstart = self.id
                     self.id += 1
-                if self.mode == 2 and self.current_looptimes < self.looptimes:
-                    self.current_looptimes += 1
-                    self.id = self.loopstart
-                if self.mode == 2 and self.current_looptimes == self.looptimes:
-                    self.id += 1
-                    self.current_looptimes = 0
 
-            if self.id > self.max_id:
-                break
+                if self.mode == 2:
+                    if self.current_looptimes == self.looptimes - 1:
+                        self.current_looptimes += 1
+                        self.id += 1
 
+                    if self.current_looptimes < self.looptimes - 1:
+                        self.current_looptimes += 1
+                        self.id = self.loopstart
+
+                    self.statusbar['mode'] = ('循环' + '---[' + str(self.current_looptimes)
+                                              + '/' + str(self.looptimes) + ']')
+                    self._signal.emit(self.statusbar)
+
+                    if self.current_looptimes == self.looptimes:
+                        self.current_looptimes = 0
+                        self.loopstart = 0
+                    
 
 if __name__ == '__main__':
     app = PyQt5.QtWidgets.QApplication(sys.argv)

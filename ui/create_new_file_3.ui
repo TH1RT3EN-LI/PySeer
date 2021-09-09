@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>CreateNewFile</class>
- <widget class="QDialog" name="CreateNewFile">
+ <widget class="QMainWindow" name="CreateNewFile">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -22,66 +22,74 @@
     <height>240</height>
    </size>
   </property>
-  <property name="font">
-   <font>
-    <family>微软雅黑</family>
-   </font>
-  </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>60</y>
+      <width>219</width>
+      <height>64</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>本次循环次数</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="pushButton_1">
+         <property name="text">
+          <string>保存</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_3">
+         <property name="text">
+          <string>取消</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>80</y>
-     <width>219</width>
-     <height>64</height>
+     <x>0</x>
+     <y>0</y>
+     <width>320</width>
+     <height>23</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>本次循环次数</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="lineEdit"/>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="pushButton_1">
-        <property name="text">
-         <string>保存</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_3">
-        <property name="text">
-         <string>取消</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections>
@@ -92,12 +100,12 @@
    <slot>btn_clicked_1()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>115</x>
-     <y>130</y>
+     <x>123</x>
+     <y>133</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>156</y>
+     <x>116</x>
+     <y>162</y>
     </hint>
    </hints>
   </connection>
@@ -108,19 +116,18 @@
    <slot>btn_clicked_2()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>193</x>
-     <y>126</y>
+     <x>245</x>
+     <y>134</y>
     </hint>
     <hint type="destinationlabel">
-     <x>202</x>
-     <y>150</y>
+     <x>248</x>
+     <y>172</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
-  <slot>get_loop_times()</slot>
-  <slot>btn_clicked_2()</slot>
   <slot>btn_clicked_1()</slot>
+  <slot>btn_clicked_2()</slot>
  </slots>
 </ui>

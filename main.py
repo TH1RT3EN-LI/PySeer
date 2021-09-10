@@ -1,11 +1,13 @@
 # 自带库
 import os
-import time
 import random
 import sqlite3
 import sys
+import time
+
 # 第三方库
 import cv2
+import keyboard
 import numpy as np
 import pyautogui
 import PyQt5.QtWidgets
@@ -15,6 +17,7 @@ import win32gui
 from PIL import Image, ImageQt
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QDesktopWidget
+
 # 窗口UI
 import ui.Ui_create_new_file_1
 import ui.Ui_create_new_file_2
@@ -52,7 +55,7 @@ class CreateNewFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_1.Ui_Cre
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setWindowTitle('TH1RT3EN PySeer')
+        self.setWindowTitle('TH1RT3EN PySeer---命名脚本')
         self.text = 'test'
         self.setWindowlocation()
 
@@ -97,13 +100,13 @@ class CreateNewFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_1.Ui_Cre
         self.cnfb.filename = self.text
         self.cnfb.show()
         self.close()
-        
+
 
 class CreateNewFileB(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_2.Ui_CreateNewFile):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setWindowTitle('TH1RT3EN PySeer')
+        self.setWindowTitle('TH1RT3EN PySeer---创建脚本')
         self.windowname = ''
         self.filename = ''
         self.looptimes = 0
@@ -189,6 +192,7 @@ class CreateNewFileB(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_2.Ui_Cre
         self.windowname = self.lineEdit.text()
     
     def insert_into_file(self, dbpath, pngpath, id, mode, looptimes):
+        """存储数据到.db文件"""
         conn = sqlite3.connect(dbpath)
         c = conn.cursor()
         c.execute(f"INSERT INTO PYSEER (ID, PATH, MODE, LOOPTIMES) \
@@ -236,19 +240,18 @@ class CreateNewFileC(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_3.Ui_Cre
         self.cnfd = cnfd
 
     def setWindowlocation(self):
+        """设置窗口位置"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
         self.move(int(screen.width() - size.width()), 60)
 
     def btn_clicked_1(self):
         """保存"""
-        # 向上一个窗口传递参数
         try:
             self._signal.emit(int(self.lineEdit.text()))
             self.cnfd.btn_clicked_1()
             self.cnfd.close()
             self.close()
-        # 如果输入值错误，返回ValueError无法提交
         except ValueError:
             pass
         
@@ -268,6 +271,7 @@ class CreateNewFileC(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_3.Ui_Cre
            self.cnfd.close()
         self.close()
 
+
 class CreateNewFileD(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_4.Ui_CreateNewFile):
     def __init__(self):
         super().__init__()
@@ -276,6 +280,7 @@ class CreateNewFileD(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_4.Ui_CreateN
         self.setWindowlocation()
 
     def setWindowlocation(self):
+        """设置窗口位置"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
         self.move(int(screen.width() - size.width()), 60)
@@ -300,17 +305,22 @@ class CreateNewFileD(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_4.Ui_CreateN
 
 
 class LoadFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_load_file_1.Ui_LoadFile):
-    
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setWindowTitle('TH1RT3EN PySeer')
+        self.setWindowTitle('TH1RT3EN PySeer---加载脚本')
         self.dbpath = ''
         self.id_dict = {}
         self.windowname = ''
         self.setWindowlocation()
         self.initUi()
- 
+        global rc
+        global ps
+        global ft
+        ps = False
+        rc = False
+        ft = True
+
     def initUi(self):
         self.status = self.statusBar()
         self.lf_status = PyQt5.QtWidgets.QLabel('状态： 未运行')
@@ -369,8 +379,7 @@ class LoadFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_load_file_1.Ui_LoadFile):
             rc = True
         else:
             rc = False
-
-
+            
 
 class ThreadA(QtCore.QThread):
     _signal = QtCore.pyqtSignal(dict)
@@ -427,18 +436,17 @@ class ThreadA(QtCore.QThread):
         """匹配图片 返回相对坐标"""
         screen = np.array(image)
         img_rgb = cv2.cvtColor(screen, cv2.COLOR_BGR2RGB)
-        # target路径不能有中文
         target = cv2.imread(icon)
         target_height, target_width = target.shape[:2]
         result = cv2.matchTemplate(img_rgb, target, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-        # # topleft/ bottomright
         tl = max_loc
         br = (tl[0] + target_width, tl[1] + target_height)
-        # print(min_val, max_val, min_loc, max_loc)
         return tl, br, max_val
 
     def run(self):
+        """主逻辑"""
+        global ft
         self.statusbar['status'] = '运行中'
         self.statusbar['mode'] = '-----'
         self._signal.emit(self.statusbar)
@@ -451,7 +459,7 @@ class ThreadA(QtCore.QThread):
         self.loopstart = 0
         self.current_looptimes = 0
 
-        while True:  
+        while ft:
             self.image = self.grab_window()
             self.mode = self.id_dict[self.id][1]
             self.path = self.id_dict[self.id][0]
@@ -498,7 +506,10 @@ class ThreadA(QtCore.QThread):
                 self.statusbar['status'] = '已完成'
                 self.statusbar['mode'] = '-----'
                 self._signal.emit(self.statusbar)
-                break
+                ft = False
+
+            if keyboard.is_pressed('1'):
+                ft = False
 
 
 class ThreadB(QtCore.QThread):
@@ -517,13 +528,15 @@ class ThreadB(QtCore.QThread):
         return x1, y1, x2, y2
     
     def prevent_sleep(self):
-        """随机移动鼠标防止休眠"""
+        """随机在窗口范围内移动鼠标防止休眠"""
         x1, y1, x2, y2 = self.get_window_coordinate()
         pyautogui.moveTo(random.randrange(x1, x2), random.randrange(y1, y2))
-    
+   
     def run(self):
-        while ps:
-            self.prevent_sleep()
+        """运行放休眠操作"""
+        while ft:
+            if ps:
+                self.prevent_sleep()
 
 
 if __name__ == '__main__':

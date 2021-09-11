@@ -343,6 +343,7 @@ class LoadFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_load_file_1.Ui_LoadFile):
         self.id_dict = {}
         self.windowname = ''
         self.status_message = ''
+        self.status = self.statusBar()
         self.setWindowLocation()
         self.setWindowIcon(PyQt5.QtGui.QIcon(r'PySeer\icon.png'))
         self.initstatusbar()
@@ -356,7 +357,6 @@ class LoadFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_load_file_1.Ui_LoadFile):
 
 
     def initstatusbar(self):
-        self.status = self.statusBar()
         self.status.showMessage(self.status_message, 0)
         self.lf_status = PyQt5.QtWidgets.QLabel('状态： 未运行')
         self.lf_mode = PyQt5.QtWidgets.QLabel('模式： -----' + ' ' * 10)
@@ -520,6 +520,9 @@ class ThreadA(QtCore.QThread):
                 if self.mode == 1:
                     self.loopstart = self.id
                     self.id += 1
+                    self.statusbar['mode'] = ('循环' + '---[' + str(self.current_looptimes)
+                                              + '/' + str(self.looptimes) + ']')
+                    self._signal.emit(self.statusbar)
 
                 if self.mode == 2:
                     if self.current_looptimes == self.looptimes - 1:

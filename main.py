@@ -1,6 +1,7 @@
 # 自带库
 import os
 import random
+import re
 import sqlite3
 import sys
 import time
@@ -32,9 +33,10 @@ class MainWindow(PyQt5.QtWidgets.QMainWindow, ui.Ui_mainwindow.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('TH1RT3EN PySeer')
-        self.setWindowlocation()
+        self.setWindowLocation()
+        self.setWindowIcon(PyQt5.QtGui.QIcon(r'PySeer\icon.png'))
 
-    def setWindowlocation(self):
+    def setWindowLocation(self):
         """设置窗口位置于屏幕右上角"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
@@ -56,10 +58,13 @@ class CreateNewFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_1.Ui_Cre
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('TH1RT3EN PySeer---命名脚本')
-        self.text = 'test'
-        self.setWindowlocation()
+        self.text = ''
+        self.setWindowLocation()
+        self.setWindowIcon(PyQt5.QtGui.QIcon(r'PySeer\icon.png'))
+        self.status = self.statusBar()
+        self.status_message = ''
 
-    def setWindowlocation(self):
+    def setWindowLocation(self):
         """设置窗口位置于屏幕右上角"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
@@ -95,11 +100,21 @@ class CreateNewFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_1.Ui_Cre
 
     def btn_clicked(self):
         """开始"""
-        self.cnfb = CreateNewFileB()
-        self.cnfb.dbpath = self.create_new_file()
-        self.cnfb.filename = self.text
-        self.cnfb.show()
-        self.close()
+        self.zh_model = re.compile(u'[\u4e00-\u9fa5]')
+        self.ban_mark = re.compile(U'\W')
+        self.listdir = os.listdir(r'PySeer\default_files')
+        if self.zh_model.search(self.text) or self.ban_mark.search(self.text) or len(self.text) == 0:
+            self.status_message = '命名失败！请检查并重试！'
+            self.status.showMessage(self.status_message, 3000)
+        if (self.text + '.db') in self.listdir:
+            self.status_message = '命名重复！请检查并重试！'
+            self.status.showMessage(self.status_message, 3000)
+        else:
+            self.cnfb = CreateNewFileB()
+            self.cnfb.dbpath = self.create_new_file()
+            self.cnfb.filename = self.text
+            self.cnfb.show()
+            self.close()
 
 
 class CreateNewFileB(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_2.Ui_CreateNewFile):
@@ -114,9 +129,12 @@ class CreateNewFileB(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_2.Ui_Cre
         self.dbpath = ''
         self.pngpath = ''
         self.cnfd = CreateNewFileD()
-        self.setWindowlocation()
-
-    def setWindowlocation(self):
+        self.setWindowLocation()
+        self.setWindowIcon(PyQt5.QtGui.QIcon(r'PySeer\icon.png'))
+        self.status = self.statusBar()
+        self.status_message = ''
+        
+    def setWindowLocation(self):
         """设置窗口位置于屏幕右上角"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
@@ -171,9 +189,13 @@ class CreateNewFileB(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_2.Ui_Cre
 
     def btn_clicked_5(self):
         """撤销"""
-        self.id -= 1
-        self.delete_db(self.dbpath, self.id)
-        os.remove('PySeer\\target\\' + self.filename + '\\' + str(self.id) + '.png')
+        try:
+            self.id -= 1
+            self.delete_db(self.dbpath, self.id)
+            os.remove('PySeer\\target\\' + self.filename + '\\' + str(self.id) + '.png')
+        except TypeError:
+            self.status_message = '！！！无可撤销内容！！！'
+            self.status.showMessage(self.status_message, 3000)
         
     def delete_db(self, dbpath, id):
         """删除数据库文件的最后一项"""
@@ -236,10 +258,11 @@ class CreateNewFileC(PyQt5.QtWidgets.QMainWindow, ui.Ui_create_new_file_3.Ui_Cre
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('TH1RT3EN PySeer')
-        self.setWindowlocation()
+        self.setWindowLocation()
+        self.setWindowIcon(PyQt5.QtGui.QIcon(r'PySeer\icon.png'))
         self.cnfd = cnfd
 
-    def setWindowlocation(self):
+    def setWindowLocation(self):
         """设置窗口位置"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
@@ -277,9 +300,10 @@ class CreateNewFileD(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_4.Ui_CreateN
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('TH1RT3EN PySeer')
-        self.setWindowlocation()
+        self.setWindowLocation()
+        self.setWindowIcon(PyQt5.QtGui.QIcon(r'PySeer\icon.png'))
 
-    def setWindowlocation(self):
+    def setWindowLocation(self):
         """设置窗口位置"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
@@ -307,28 +331,39 @@ class CreateNewFileD(PyQt5.QtWidgets.QDialog, ui.Ui_create_new_file_4.Ui_CreateN
 class LoadFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_load_file_1.Ui_LoadFile):
     def __init__(self):
         super().__init__()
-        self.setupUi(self)
-        self.setWindowTitle('TH1RT3EN PySeer---加载脚本')
-        self.dbpath = ''
-        self.id_dict = {}
-        self.windowname = ''
-        self.setWindowlocation()
-        self.initUi()
         global rc
         global ps
         global ft
         ps = False
         rc = False
         ft = True
+        self.setupUi(self)
+        self.setWindowTitle('TH1RT3EN PySeer---加载脚本')
+        self.dbpath = ''
+        self.id_dict = {}
+        self.windowname = ''
+        self.status_message = ''
+        self.setWindowLocation()
+        self.setWindowIcon(PyQt5.QtGui.QIcon(r'PySeer\icon.png'))
+        self.initstatusbar()
+        
 
-    def initUi(self):
+    def closeEvent(self, event):
+        """重写closeEvent方法"""
+        global ft
+        ft = False
+        event.accept()
+
+
+    def initstatusbar(self):
         self.status = self.statusBar()
+        self.status.showMessage(self.status_message, 0)
         self.lf_status = PyQt5.QtWidgets.QLabel('状态： 未运行')
-        self.lf_mode = PyQt5.QtWidgets.QLabel('模式： -----')
-        self.status.addPermanentWidget(self.lf_status, stretch=5)
-        self.status.addPermanentWidget(self.lf_mode, stretch=5)
+        self.lf_mode = PyQt5.QtWidgets.QLabel('模式： -----' + ' ' * 10)
+        self.status.addPermanentWidget(self.lf_status, stretch=0)
+        self.status.addPermanentWidget(self.lf_mode, stretch=0)
 
-    def setWindowlocation(self):
+    def setWindowLocation(self):
         """设置窗口位置"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
@@ -352,6 +387,8 @@ class LoadFileA(PyQt5.QtWidgets.QMainWindow, ui.Ui_load_file_1.Ui_LoadFile):
         
     def btn_clicked_1(self):
         """执行子线程 更新状态栏"""
+        global ft
+        ft = True
         self.id = 1
         self.click_times = 0
         self.max_id = len(self.id_dict)
@@ -448,7 +485,7 @@ class ThreadA(QtCore.QThread):
         """主逻辑"""
         global ft
         self.statusbar['status'] = '运行中'
-        self.statusbar['mode'] = '-----'
+        self.statusbar['mode'] = '-----' + ' ' * 10
         self._signal.emit(self.statusbar)
 
         self.save_to_dict()
@@ -502,13 +539,17 @@ class ThreadA(QtCore.QThread):
                         self.loopstart = 0
 
             if self.id > self.max_id:
-                time.sleep(2)
+                time.sleep(1)
                 self.statusbar['status'] = '已完成'
-                self.statusbar['mode'] = '-----'
+                self.statusbar['mode'] = '-----' + ' ' * 10
                 self._signal.emit(self.statusbar)
                 ft = False
 
             if keyboard.is_pressed('1'):
+                time.sleep(1)
+                self.statusbar['status'] = '已终止'
+                self.statusbar['mode'] = '-----' + ' ' * 10
+                self._signal.emit(self.statusbar)
                 ft = False
 
 
